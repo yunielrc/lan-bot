@@ -1,3 +1,4 @@
 # airos-change-mac-name
 
-Genera una mac y un nombre aleatorio, entra al dispositivo AirOS, cambia la mac, el nombre y lo reinicia.
+Cambia la mac de la interfaz WAN y el nombre a un dispositivo AirOS, a partir
+de valores aleatorios.
