@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# {{{ Bash settings
+# abort on nonzero exitstatus
+set -o errexit
+# abort on unbound variable
+# set -o nounset
+# don't hide errors within pipes
+set -o pipefail
+# }}}
+
 # Cambia la mac de la interfaz WAN y el nombre a un dispositivo AirOS, a partir
 # de valores aleatorios.
 
@@ -52,6 +61,7 @@ random_mac() {
   local -r  random3hex="$(openssl rand -hex 3)"
   
   echo "${oui^^}${random3hex^^}" | sed 's/\(..\)/\1:/g; s/:$//'
+  return 0
 }
 
 #######################################
@@ -61,6 +71,7 @@ random_mac() {
 #######################################
 random_alphanumeric() {
   cat /dev/urandom | tr -dc 'A-Z0-9' | fold -w "${1:-10}" | head -n 1
+  return 0
 }
 
 #######################################
@@ -81,10 +92,7 @@ random_alphanumeric() {
 # 255: acceso ssh a AirOS denegado
 #######################################
 airos_set_config() {
-  local -r user="$1"
-  local -r ip="$2"
-  local -r config="$3"
-  local -r reboot="${4:-1}"
+  local -r user="$1" ip="$2" config="$3" reboot="${4:-1}"
   
   local -r airoscfg='/tmp/system.cfg'
   
@@ -110,7 +118,7 @@ airos_set_config() {
     rebootCMD='reboot'
   fi
   
-
+  
   ssh -T "${user}@${ip}" &> /dev/null <<SSHEOF
   config='$config'
   for keyvalue in \$config; do
@@ -133,6 +141,7 @@ SSHEOF
     err "A ocurrido un error en '${user}@${ip}', código de error: $ret"
     exit $ret
   fi
+  return 0
 }
 
 #######################################
@@ -149,10 +158,7 @@ SSHEOF
 # 1-255: error
 #######################################
 airos_set_mac_and_name() {
-  local -r user="$1"
-  local -r ip="$2"
-  local -r oui="$3"
-  local -r reboot="${4:-1}"
+  local -r user="$1" ip="$2" oui="$3" reboot="${4:-1}"
   
   local -r n=10
   local -r mac="$(random_mac "${oui}")"
@@ -161,14 +167,15 @@ airos_set_mac_and_name() {
   resolv.host.1.name=${name}"
   
   airos_set_config "$user" "$ip" "$config" "$reboot"
-
+  
   local -r ret=$?
   if [[ $ret ]]; then
-    cat <<EOF 
+    cat <<EOF
     airmac:${mac}
     airname:${name}
 EOF
   fi
+  return 0
 }
 
 #######################################
@@ -182,18 +189,20 @@ EOF
 #   None
 #######################################
 usage(){
-  cat <<EOF
+  local oui="${1:-'/tmp/oui.txt'}"
+  
+  cat <<HELPMSG
   ${SCRIPT_NAME}, version ${SCRIPT_VERSION}
 
-  Cambia la mac de la interfaz WAN y el nombre de red a un dispositivo AirOS 
-  a partir de valores aleatorios. Si tuvo éxito imprime la nueva mac y el nuevo 
+  Cambia la mac de la interfaz WAN y el nombre de red a un dispositivo AirOS
+  a partir de valores aleatorios. Si tuvo éxito imprime la nueva mac y el nuevo
   nombre del dispositivo AirOS
 
   Requisitos:
   - El dispositivo AirOS debe tener agregada la clave pública del sistema donde
     se ejecuta este script. A continuación se muestra cómo agregadarla al dispositivo:
     1- Descarga la clave pública del dispositivo donde se ejecuta este script a tu PC.
-    2- Entra a la interfaz web del dispositivo AirOS 'SERVICES/SSH Server/', toca el 
+    2- Entra a la interfaz web del dispositivo AirOS 'SERVICES/SSH Server/', toca el
       botón 'Edit' y agrega la clave pública descargada.
   - Tener habilitada la opción 'Network/WAN Network Settings/MAC Address Cloning'
     en el dispositivo AirOS.
@@ -218,16 +227,10 @@ usage(){
   69: Host AirOS inalcanzable
   74: No se encontró el archivo oui.txt
   255: Acceso ssh al dispositivo AirOS denegado
-EOF
+HELPMSG
 }
 
 main(){
-  # random_mac "$OUI_FILE"
-  # random_alphanumeric 10
-  # local -r config="netconf.1.hwaddr.mac=B8:07:16:ad:06:34
-  # resolv.host.1.name=WOAALHM944"
-  # airos_set_config "ubnt" "192.168.0.1" "$config"
-  
   local PARAMS=""
   local user=''
   local ip=''
@@ -237,7 +240,7 @@ main(){
   if [ "$#" -eq 0 ]; then
     eval set -- '-h'
   fi
-
+  
   while (( "$#" )); do
     case "$1" in
       -u|--user|--usuario)
@@ -255,15 +258,15 @@ main(){
       -r|--reboot|--reiniciar)
         reboot=0
         shift 1
-      ;; 
+      ;;
       -h|--help|--ayuda)
         usage "$oui"
         exit 0
-      ;;              
+      ;;
       --) # end argument parsing
         shift
         break
-      ;;   
+      ;;
       *) # preserve positional arguments
         PARAMS="$PARAMS $1"
         shift
@@ -272,8 +275,19 @@ main(){
   done
   # set positional arguments in their proper place
   eval set -- "$PARAMS"
-
+  
   airos_set_mac_and_name "$user" "$ip" "$oui" "$reboot"
 }
 
-main "$@"
+finish () {
+  result=$?
+  if [[ "$TEST" == 'true' ]]; then
+    echo "$result"
+  fi
+  exit ${result}
+}
+trap finish EXIT
+
+if [[ "$0" == "${BASH_SOURCE[0]}" ]]; then
+  main "$@"
+fi

@@ -9,7 +9,7 @@
       "request": "launch",
       "name": "Bash-Debug (airos_random_mac_and_name)",
       "cwd": "${workspaceFolder}",
-      "program": "${workspaceFolder}/airos_random_mac_and_name/airos_random_mac_and_name",
+      "program": "${workspaceFolder}/airos_random_mac_and_name/airos_random_mac_and_name.bash",
       "args": ["-u", "ubnt", "-i", "192.168.0.1"]
     },
     {
