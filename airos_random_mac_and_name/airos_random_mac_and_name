@@ -51,7 +51,7 @@ random_mac() {
   local -r oui="$(grep -oh  '^[0-9A-Fa-f]\{6\}' "$ouiFile" | shuf -n 1)"
   local -r  random3hex="$(openssl rand -hex 3)"
   
-  echo "${oui}${random3hex}" | sed 's/\(..\)/\1:/g; s/:$//'
+  echo "${oui^^}${random3hex^^}" | sed 's/\(..\)/\1:/g; s/:$//'
 }
 
 #######################################
