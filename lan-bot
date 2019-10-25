@@ -1,0 +1,48 @@
+#! /usr/bin/env bash
+
+##  Bash settings
+# abort on nonzero exitstatus
+set -o errexit
+# abort on unbound variable
+set -o nounset
+# don't hide errors within pipes
+set -o pipefail
+# debug
+set -o xtrace
+##
+
+## Global Variables
+# shellcheck disable=2034
+readonly SCRIPT_NAME=$(basename "${0}")
+readonly SCRIPT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+# shellcheck disable=2034
+readonly SCRIPT_VERSION='1.0.0'
+##
+
+## Includes
+# shellcheck disable=1090
+source "${SCRIPT_PATH}/lib/exit-codes.bash"
+# shellcheck disable=1090
+source "${SCRIPT_PATH}/lib/utils.bash"
+##
+
+
+
+# IFS=$'\t\n'   # Split on newlines and tabs (but not on spaces)
+
+#
+
+## Helper functions
+
+
+
+#
+
+main() {
+  # check_args "${@}"
+  :
+}
+
+
+
+main "${@}"
