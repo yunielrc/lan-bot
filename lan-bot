@@ -56,6 +56,10 @@ done
 
 cat <<HELPFOOTER
 
+Output:
+Tarea        T de ejecución    Código     Mensaje
+task-xxx     3.0(s)             0          OK
+
 Run '${ENTRY_POINT} TASK --help' for more information on a task.
 HELPFOOTER
 }
@@ -66,7 +70,7 @@ version(){
 
 print_run_task_result() {
   local -r taskName="$1" runTime="$2" exitCode="$3" exitMsg="$4"
-  printf "%-25s %-3.1f(s)  %-5u %s\n" "$taskName" "$runTime" "$exitCode" "$exitMsg"
+  printf "%-25s %-4.1f(s)  %-5u %s\n" "$taskName" "$runTime" "$exitCode" "$exitMsg"
 }
 
 #######################################
