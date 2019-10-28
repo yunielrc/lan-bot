@@ -39,6 +39,9 @@ airos.set_config() {
   if [[ "$reboot" -eq 0 ]]; then
     rebootCMD='reboot'
   fi
+
+   local ret=0
+
   (
     ssh -p "$puerto" \
     -o 'ConnectTimeout=1' \
@@ -55,10 +58,8 @@ airos.set_config() {
   save
   ${rebootCMD}
 SSHEOF
-  ) || 
+  ) || ret=$?
   
-  local -r ret=$?
-
   if [[ $ret == 255 ]]; then
     err "Acceso denegado a '${user}@${ip}'" "$ret"
   fi

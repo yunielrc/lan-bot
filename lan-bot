@@ -2,7 +2,7 @@
 
 ##  Bash settings
 # abort on nonzero exitstatus
- set -o errexit
+set -o errexit
 # abort on unbound variable
  set -o nounset
 # don't hide errors within pipes
@@ -64,6 +64,12 @@ version(){
   echo "${ENTRY_POINT} version $(cat "${BASE_PATH}/VERSION")"
 }
 
+print_run_task_result() {
+  local -r taskName="$1" runTime="$2" exitCode="$3" exitMsg="$4"
+  sleep 1
+  printf "%-25s %-3.1f(s)  %-5u %s\n" "$taskName" "$runTime" "$exitCode" "$exitMsg"
+}
+
 #######################################
 # Ejecuta una tarea
 #
@@ -84,7 +90,16 @@ run_task(){
   fi
   # shellcheck disable=1090
   source "${taskFullPath}"
-  "${task}.run" "$@"
+  local -r time1=$(date +%s)
+  local code=0
+  local msg=''
+  msg="$("${task}.run" "$@" 2>&1)" || code=$?
+  [[ -z "$msg" ]] && msg='OK'
+  local -r time2=$(date +%s)
+
+  print_run_task_result "$task" "$(( time2 - time1 ))" "$code" "$msg"
+
+  return $code
 }
 
 #
