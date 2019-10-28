@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+
+##  Bash settings
+# abort on nonzero exitstatus
+set -o errexit
+# abort on unbound variable
+ set -o nounset
+# don't hide errors within pipes
+ set -o pipefail
+# debug
+# set -o xtrace
+##
+
+## Global Variables
+readonly SCRIPT_NAME="${ENTRY_POINT:-"$(basename "${0}")"}"
+readonly BASE_PATH="${BASE_PATH:-"$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"}"
+##
+
+## Includes
+# shellcheck disable=1090
+source "${BASE_PATH}/lib/exit-codes.bash"
+# shellcheck disable=1090
+source "${BASE_PATH}/lib/utils.bash"
+##
+
+# IFS=$'\t\n'   # Split on newlines and tabs (but not on spaces)
+
+## Functions
+
+log_to_file(){
+  local -r logfile="$1" logtext="$2"
+  [[ $logfile =~ ^(/[^/ ]*)+/?$ ]] || err "Path de log incorrecto: '${logfile}'" "$EX_ARGERR"
+  [[ -n "$logtext" ]] || err "Sin texto para hacer log" "$EX_ARGERR"
+  local -r logdate="$(date +%Y%m%d-%H%M%S)"
+  declare -i code=0
+
+  printf "%-18s %s\n" "$logdate" "$logtext" >> "$logfile" || code=$?
+
+  if [[ $code == 1 ]]; then
+    err "Permiso denegado" 1
+  fi
+
+  return $code
+}
+
+##
+
+main(){
+
+  if [[ "$#" = 0 || "$1" == '-h' || "$1" == '--help' ]]; then
+    echo "Usage: lan-bot task-xxx --param pvalue | ${SCRIPT_NAME} ~/logfile"
+    exit 0
+  fi
+
+  local logtext=''
+  read -r logtext
+  local -r logfile="${1:-}"
+
+  log_to_file "$logfile" "$logtext"
+}
+
+main "$@"
