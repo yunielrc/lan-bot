@@ -36,5 +36,5 @@ teardown() {
     run lan-bot "$task" --param 123
 
     [ "$status" -eq 0 ]
-    [[ "$output" == 'OK' ]]
+    [[ "$output" =~ "$task".*OK ]]
 }

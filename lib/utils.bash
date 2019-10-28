@@ -1,15 +1,3 @@
-
-##  Bash settings
-# abort on nonzero exitstatus
-set -o errexit
-# abort on unbound variable
-# set -o nounset
-# don't hide errors within pipes
-# set -o pipefail
-# debug
-#set -o xtrace
-##
-
 #######################################
 # Imprime un mensaje de error
 # Arguments:
@@ -18,9 +6,9 @@ set -o errexit
 #######################################
 err() {
   local -r msg="$1"
-  local -r exitCode="$2"
-  echo "[$(date +'%Y-%m-%dT%H:%M:%S%z')] - Error: ${msg}" 1>&2
-  if [[ -n "$exitCode" && "$exitCode" =~ ^[0-9]+$ ]]; then
+  local -r exitCode="${2:-0}"
+  echo "Error: ${msg}" 1>&2
+  if [[ "$exitCode" -gt 0 ]]; then
     exit "$exitCode"
   fi
 }
