@@ -66,7 +66,6 @@ version(){
 
 print_run_task_result() {
   local -r taskName="$1" runTime="$2" exitCode="$3" exitMsg="$4"
-  sleep 1
   printf "%-25s %-3.1f(s)  %-5u %s\n" "$taskName" "$runTime" "$exitCode" "$exitMsg"
 }
 
