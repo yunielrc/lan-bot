@@ -1,3 +1,10 @@
+# Modifica la mac y el nombre del un dispositivo AirOS a partir de valores generados.
+
+## Includes
+# shellcheck disable=1090
+source "${SERVICES_DIR}/airos-client.bash"
+##
+
 
 #######################################
 # Muestra la ayuda
@@ -10,11 +17,14 @@
 # Returns:
 #   None
 #######################################
-print_help(){
-  local oui="${1:-'/tmp/oui.txt'}"
-  
+usage(){
+
+
+  local -r TASK="$(file_name "${BASH_SOURCE[0]}")"
+
   cat <<HELPMSG
-  ${SCRIPT_NAME}, version ${SCRIPT_VERSION}
+  Usage: 
+  ${ENTRY_POINT} ${TASK} [OPTIONS]
 
   Cambia la mac de la interfaz WAN y el nombre de red a un dispositivo AirOS
   a partir de valores aleatorios. Si tuvo éxito imprime la nueva mac y el nuevo
@@ -29,19 +39,13 @@ print_help(){
   - Tener habilitada la opción 'Network/WAN Network Settings/MAC Address Cloning'
     en el dispositivo AirOS.
 
-  Uso: ${SCRIPT_NAME} --user john --ip 192.168.0.1 [--reboot] \\
-      [--oui ${oui}]
+  Options: ${ENTRY_POINT} ${TASK} --user john --ip 192.168.0.1 [--reboot]
 
-    -h, --help, --ayuda
-      muestra la ayuda
-    -u, --user, --usuario
-      usuario del dispositivo AirOS
-    -i, --ip
-      ip del dispositivo AirOS
-    -o, --oui
-      ruta completa del archivo oui.txt
-    -r, --reboot, --reiniciar
-      reinicia el dispositivo AirOS para aplicar los cambios
+    -h, --help             Muestra la ayuda
+    -u, --user,            Usuario del dispositivo AirOS
+    -i, --ip               IP del dispositivo AirOS
+    -o, --oui              Ruta completa del archivo oui.txt
+    -r, --reboot           reinicia el dispositivo AirOS para aplicar los cambios
 
   Exit status:
   0: Configuración cambiada en dispositivo AirOS
@@ -52,49 +56,44 @@ print_help(){
 HELPMSG
 }
 
-main(){
+airos-random-mac-name.run(){
   local user=''
   local ip=''
-  local oui="$SCRIPT_PATH/etc/oui.txt"
+  local oui="${ETC_DIR}/oui.txt"
   local reboot=1
   
-  if [ "$#" -eq 0 ]; then
-    eval set -- '-h'
+  if [[ "$#" == 0 ]]; then
+    set -- '-h'
   fi
   
   while (( "$#" )); do
     case "$1" in
       -u|--user|--usuario)
         user=$2
-        shift 2
+        shift
       ;;
       -i|--ip)
         ip=$2
-        shift 2
+        shift
       ;;
       -o|--oui)
         oui=$2
-        shift 2
+        shift
       ;;
       -r|--reboot|--reiniciar)
         reboot=0
-        shift 1
       ;;
-      -h|--help|--ayuda)
-        print_help "$oui"
+      -h|--help|'')
+        usage
         exit 0
       ;;
-      --) # end argument parsing
-        shift
-        break
-      ;;
-      -*) 
-
+      *)
+        usage
+        exit 1       
       ;;
     esac
+    shift
   done
   
-  airos_set_mac_and_name "$user" "$ip" "$oui" "$reboot"
+  airos.set_random_mac_and_name "$user" "$ip" "$oui" "$reboot"
 }
-
-main "$@"

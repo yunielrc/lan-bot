@@ -14,3 +14,4 @@ readonly EX_TEMPFAIL=75	#temp failure; user is invited to retry
 readonly EX_PROTOCOL=76	#remote error in protocol
 readonly EX_NOPERM=77	#permission denied
 readonly EX_CONFIG=78	#configuration error
+readonly EX_ARGERR=79 #argumento no válido

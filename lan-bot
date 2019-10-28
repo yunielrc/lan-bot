@@ -1,48 +1,115 @@
-#! /usr/bin/env bash
+#!/bin/bash
 
 ##  Bash settings
 # abort on nonzero exitstatus
-set -o errexit
+ set -o errexit
 # abort on unbound variable
-set -o nounset
+ set -o nounset
 # don't hide errors within pipes
-set -o pipefail
+ set -o pipefail
 # debug
-set -o xtrace
+# set -o xtrace
 ##
 
 ## Global Variables
-# shellcheck disable=2034
-readonly SCRIPT_NAME=$(basename "${0}")
-readonly SCRIPT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-# shellcheck disable=2034
-readonly SCRIPT_VERSION='1.0.0'
+# shellcheck disable=2034 disable=2155
+readonly ENTRY_POINT="${ENTRY_POINT:-"$(basename "${0}")"}"
+# shellcheck disable=2034 disable=2155
+readonly BASE_PATH="${BASE_PATH:-"$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"}"
+readonly TASK_DIR="${TASK_DIR:-"${BASE_PATH}/tasks"}"
+readonly SERVICES_DIR="${BASE_PATH}/services"
+readonly ETC_DIR="${BASE_PATH}/etc"
+readonly LIB_DIR="${BASE_PATH}/lib"
 ##
 
 ## Includes
 # shellcheck disable=1090
-source "${SCRIPT_PATH}/lib/exit-codes.bash"
+source "${BASE_PATH}/lib/exit-codes.bash"
 # shellcheck disable=1090
-source "${SCRIPT_PATH}/lib/utils.bash"
+source "${BASE_PATH}/lib/utils.bash"
 ##
-
-
 
 # IFS=$'\t\n'   # Split on newlines and tabs (but not on spaces)
 
+## Functions
+
+usage(){
+  cat <<HELPHEADER
+Usage:	${ENTRY_POINT} [OPTIONS] [TASK]
+
+LAN BOT, ejecuta tareas que automatizan procesos humanos en la red. 
+
+Options:
+  -v, --version            Print version information and quit
+  -h, --help               Print help information and quit
+
+Tasks:
+HELPHEADER
+
+for task in "${TASK_DIR}/"*; do
+  local taskname="${task%.bash}"
+  # shellcheck disable=2155
+  local tasktext=$(head --lines=1 "$task")
+  
+  printf "%-25s %-20s\n" "${taskname##*/}" "${tasktext#\#}"
+done
+
+cat <<HELPFOOTER
+
+Run '${ENTRY_POINT} TASK --help' for more information on a task.
+HELPFOOTER
+}
+
+version(){
+  echo "${ENTRY_POINT} version $(cat "${BASE_PATH}/VERSION")"
+}
+
+#######################################
+# Ejecuta una tarea
 #
+# Arguments:
+#   1: task to run
+# Globals:
+#   None
+# Returns:
+#   79: EX_ARGERR
+#######################################
+run_task(){
+  local -r task="$1"
+  shift
+  local -r taskFullPath="${TASK_DIR}/${task}.bash"
 
-## Helper functions
-
-
+  if [ ! -f "$taskFullPath" ]; then
+    err "Tarea no valida: '${task}'" "$EX_ARGERR"
+  fi
+  # shellcheck disable=1090
+  source "${taskFullPath}"
+  "${task}.run" "$@"
+}
 
 #
 
 main() {
-  # check_args "${@}"
-  :
+
+  if [[ "$#" == 0 ]]; then
+    set -- '-h'
+  fi
+
+  case "$1" in
+    -v|--version)
+      version
+    ;;
+    -h|--help|'')
+      usage
+    ;;
+    -*)
+    usage
+    exit 1
+    ;;
+    *)
+      run_task "$@"
+    ;;
+  esac
 }
 
-
-
-main "${@}"
+main "$@"

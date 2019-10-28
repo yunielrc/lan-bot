@@ -17,14 +17,12 @@ set -o errexit
 #   2: [código de error]
 #######################################
 err() {
-  local -r curExitCode=$?
   local -r msg="$1"
   local -r exitCode="$2"
-  echo "[$(date +'%Y-%m-%dT%H:%M:%S%z')] - Error: ${msg}" >&2
+  echo "[$(date +'%Y-%m-%dT%H:%M:%S%z')] - Error: ${msg}" 1>&2
   if [[ -n "$exitCode" && "$exitCode" =~ ^[0-9]+$ ]]; then
     exit "$exitCode"
   fi
-  # exit "$curExitCode"
 }
 
 #######################################
@@ -39,7 +37,7 @@ random_mac() {
   local -r ouiFile="$1"
   
   if [ ! -f "$ouiFile" ]; then
-    err "No se encontró el archivo oui.txt '$ouiFile'" "$EX_IOERR" >&2
+    err "No se encontró el archivo oui.txt '$ouiFile'" "$EX_IOERR"
   fi
   
   local -r oui="$(grep -oh  '^[0-9A-Fa-f]\{6\}' "$ouiFile" | shuf -n 1)"
@@ -58,4 +56,14 @@ random_alphanumeric() {
   # shellcheck disable=2002
   cat /dev/urandom | tr -dc 'A-Z0-9' | fold -w "${1:-10}" | head -n 1
   return 0
+}
+
+file_name(){
+  local -r fileFullPath="${1:-}"
+  if [ -z "$fileFullPath" ]; then
+    return
+  fi
+  
+  local filename="${fileFullPath%.*}"
+  echo "${filename##*/}"
 }

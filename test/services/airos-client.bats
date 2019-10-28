@@ -69,6 +69,7 @@ load airos-client-test_helper
 
     run airos.set_config "$user" "$ip" "$config" "1" "$AIR_PORT"
     [ "$status" -eq 0 ]
+    # echo "${LINE} status: ${status}, output: ${output}" > "/tmp/airos-client.bats.log"
     [[ -z "$output" ]]
     
     run grep --silent "netconf.1.hwaddr.mac=${mac}" "${docker_tmpdir}/system.cfg"
@@ -93,7 +94,7 @@ load airos-client-test_helper
     [[ "$output" =~ 'No se encontró el archivo oui.txt' ]]
 }
 
-@test "Cambiado el nombre la y mac al dispositivo AirOS '${TEST_FILE}:airos.set_random_mac_and_name'" {
+@test "Cambiado el nombre y la mac al dispositivo AirOS '${TEST_FILE}:airos.set_random_mac_and_name'" {
     local -r ip="$AIR_HOST"
     local -r oui="${MAIN_PATH}/test/fixtures/oui.txt"
     local -r user='root'
@@ -106,8 +107,9 @@ load airos-client-test_helper
     down_ssh_docker
 
     [ "$status" -eq 0 ]
-    [[ "${lines[0]}" =~ airmac:([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$ ]]
-    [[ "${lines[1]}" =~ airname:[A-Z0-9]{10}$ ]]
+    [[ -z "$output" ]]
+    # [[ "${lines[0]}" =~ airmac:([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$ ]]
+    # [[ "${lines[1]}" =~ airname:[A-Z0-9]{10}$ ]]
 }
 
 # fin ssh stub server

@@ -23,28 +23,28 @@ airos.set_config() {
   local -r airoscfg='/tmp/system.cfg'
   
   if [ -z "$user" ]; then
-    err "el nombre de usuario es obligatorio" "$EX_DATAERR" >&2 
+    err "el nombre de usuario es obligatorio" "$EX_DATAERR"
   fi
   if [[ ! "$ip" =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
-    err "ip: '${ip}' no válida" "$EX_DATAERR" >&2
+    err "ip: '${ip}' no válida" "$EX_DATAERR"
   fi
   if [ -z "$config" ]; then
-    err "la configuración es obligatoria" "$EX_DATAERR" >&2
+    err "la configuración es obligatoria" "$EX_DATAERR"
   fi
   if ! ping -c 1 "$ip" &> /dev/null; then
-    err "El dispositivo AirOS con ip: '${ip}' es inalcanzable" "$EX_UNAVAILABLE" >&2 
+    err "El dispositivo AirOS con ip: '${ip}' es inalcanzable" "$EX_UNAVAILABLE"
   fi
   
   local rebootCMD=''
   if [[ "$reboot" -eq 0 ]]; then
     rebootCMD='reboot'
   fi
-
-  ssh -p "$puerto" \
-  -o 'ConnectTimeout=1' \
-  -o 'BatchMode=yes' \
-  -o 'UserKnownHostsFile=/dev/null' \
-  -o 'StrictHostKeyChecking=no' \
+  (
+    ssh -p "$puerto" \
+    -o 'ConnectTimeout=1' \
+    -o 'BatchMode=yes' \
+    -o 'UserKnownHostsFile=/dev/null' \
+    -o 'StrictHostKeyChecking=no' \
   -T "${user}@${ip}" &> /dev/null <<SSHEOF
   config='$config'
   for keyvalue in \$config; do
@@ -55,11 +55,12 @@ airos.set_config() {
   save
   ${rebootCMD}
 SSHEOF
+  ) || 
   
   local -r ret=$?
-  echo "${user}@${ip}:${puerto} - codigo: ${ret}" >> "/tmp/${FUNCNAME[0]}.log"
-  if [[ $ret -eq 255 ]]; then
-    err "Acceso denegado a '${user}@${ip}'" "$ret" >&2
+
+  if [[ $ret == 255 ]]; then
+    err "Acceso denegado a '${user}@${ip}'" "$ret"
   fi
   
   if [[ $ret -ne 0 ]]; then
@@ -92,15 +93,13 @@ airos.set_random_mac_and_name() {
   resolv.host.1.name=${name}"
   
   airos.set_config "$user" "$ip" "$config" "$reboot" "$puerto"
-  
-  ret=$?
-  if [[ "$ret" == 0 ]]; then
-    cat <<EOF
-    airmac:${mac}
-    airname:${name}
-EOF
-    return 0
-  fi
-
-  err "No se pudo modificar la configuración" 1
+  #   ret=$?
+  #   if [[ "$ret" == 0 ]]; then
+  #     cat <<EOF
+  #     airmac:${mac}
+  #     airname:${name}
+  # EOF
+  #   else
+  #      err "No se pudo modificar la configuración" 1
+  #   fi
 }

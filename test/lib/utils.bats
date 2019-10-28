@@ -63,3 +63,20 @@ readonly TEST_FILE='lib/utils.bash'
     [[ "$output" =~ ^[A-Z0-9]{10}$ ]]
 }
 ##
+
+## file_name
+@test "Sin argumento, imprime nombre vacio '${TEST_FILE}:file_name'" {
+    run file_name
+    # echo "'$output'" > '/tmp/utils.bats.out'
+    [ "$status" -eq 0 ]
+    [[ -z "$output" ]]
+}
+
+@test "Con argumento, imprime nombre del archivo sin extensión '${TEST_FILE}:file_name'" {
+    run file_name '/tmp/file.txt'
+    # echo "'$output'" > '/tmp/utils.bats.out'
+    [ "$status" -eq 0 ]
+    [[ "$output" == 'file' ]]
+}
+
+##
