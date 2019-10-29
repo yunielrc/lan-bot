@@ -12,13 +12,16 @@ set -o errexit
 ##
 
 ## Global Variables
-# shellcheck disable=2034 disable=2155
+# shellcheck disable=2034,2155
 readonly ENTRY_POINT="${ENTRY_POINT:-"$(basename "${0}")"}"
-# shellcheck disable=2034 disable=2155
+# shellcheck disable=2034,2155
 readonly BASE_PATH="${BASE_PATH:-"$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"}"
 readonly TASK_DIR="${TASK_DIR:-"${BASE_PATH}/tasks"}"
+# shellcheck disable=2034,2155
 readonly SERVICES_DIR="${BASE_PATH}/services"
+# shellcheck disable=2034,2155
 readonly ETC_DIR="${BASE_PATH}/etc"
+# shellcheck disable=2034,2155
 readonly LIB_DIR="${BASE_PATH}/lib"
 ##
 

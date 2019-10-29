@@ -43,6 +43,7 @@ airos.set_config() {
    local ret=0
 
   (
+    # shellcheck disable=2215,2087
     ssh -p "$puerto" \
     -o 'ConnectTimeout=1' \
     -o 'BatchMode=yes' \
