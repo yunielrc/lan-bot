@@ -79,8 +79,7 @@ noecho_lb_logger() {
   local logfile='/lb-log'
 
   run echo_lb_logger "$logfile"
-     
-  echo "${status}, ${output}" > '/tmp/a'
+
   [[ "$status" == $code ]]
   [[ "$output" == *"$out"* ]]  
 }

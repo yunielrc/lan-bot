@@ -16,7 +16,7 @@ teardown() {
     local task='tarea-123'
 
     run lan-bot "$task"
-    # echo "out: ${output}" >> '/tmp/lan-bot.bats.out'
+
     [ "$status" -eq "$EX_ARGERR" ]
     [[ "$output" == *"Tarea no valida: '${task}'" ]]
 }

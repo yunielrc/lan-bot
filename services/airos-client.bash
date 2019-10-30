@@ -10,6 +10,7 @@
 #            resolv.host.1.name=WOAALHM944'
 #  [4: reiniciar dispositivo = 1]
 #   5: puerto ssh
+#   6: clave privada ssh
 #
 # Returns:
 # 0: configuración cambiada en dispositivo AirOS
@@ -18,8 +19,10 @@
 # 255: acceso ssh a AirOS denegado
 #######################################
 airos.set_config() {
-  local -r user="$1" ip="$2" config="$3" reboot="${4:-1}" puerto=${5:-22}
-  
+  local -r defaultkey=~/.ssh/id_rsa
+  local -r user="$1" ip="$2" config="$3" reboot="${4:-1}" puerto=${5:-22} \
+  privatekey="${6:-"$defaultkey"}"
+
   local -r airoscfg='/tmp/system.cfg'
   
   if [ -z "$user" ]; then
@@ -39,16 +42,16 @@ airos.set_config() {
   if [[ "$reboot" -eq 0 ]]; then
     rebootCMD='reboot'
   fi
-
-   local ret=0
-
+  
+  local ret=0
   (
     # shellcheck disable=2215,2087
     ssh -p "$puerto" \
     -o 'ConnectTimeout=1' \
     -o 'BatchMode=yes' \
     -o 'UserKnownHostsFile=/dev/null' \
-    -o 'StrictHostKeyChecking=no' \
+    -o 'StrictHostKeyChecking=no'  \
+    -i "$privatekey" \
   -T "${user}@${ip}" &> /dev/null <<SSHEOF
   config='$config'
   for keyvalue in \$config; do
@@ -80,13 +83,16 @@ SSHEOF
 #   3: ruta completa del archivo oui.txt
 #   [4: reiniciar dispositivo = 1]
 #   5: puerto ssh
+#   6: clave privada ssh
 #
 # Returns:
 # 0:     nombre y mac cambiadas en el dispositivo AirOS
 # 1-255: error
 #######################################
 airos.set_random_mac_and_name() {
-  local -r user="$1" ip="$2" oui="$3" reboot="${4:-1}" puerto=${5:-22}
+  local -r defaultkey=~/.ssh/id_rsa
+  local -r user="$1" ip="$2" oui="$3" reboot="${4:-1}" puerto=${5:-22} \
+  privatekey="${6:-"$defaultkey"}"
   local -r n=10
   local -r mac="$(random_mac "${oui}")"
   [[ -z "$mac" ]] && exit "$EX_IOERR"
@@ -94,7 +100,7 @@ airos.set_random_mac_and_name() {
   local -r config="netconf.1.hwaddr.mac=${mac}
   resolv.host.1.name=${name}"
   
-  airos.set_config "$user" "$ip" "$config" "$reboot" "$puerto"
+  airos.set_config "$user" "$ip" "$config" "$reboot" "$puerto" "$privatekey"
   #   ret=$?
   #   if [[ "$ret" == 0 ]]; then
   #     cat <<EOF

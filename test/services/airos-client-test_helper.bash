@@ -13,16 +13,17 @@ setup_ssh_docker() {
 
     if ! docker ps | grep --silent "$CONTAINER_NAME" ; then
       local -r tmpDir="$(mktemp -d -t lan-bot-XXXXXXXXXX)"
-      install -o "$USER" -m a+r "${MAIN_PATH}/test/files/id_rsa.pub" "${tmpDir}/" && \
+      ssh-keygen -t rsa -f "${tmpDir}/id_rsa" -q -N ""
+      # echo "$tmpDir" > /tmp/tmpdir
       install -o "$USER" -m a+rw "${MAIN_PATH}/test/fixtures/system.cfg" "${tmpDir}/" && \
-      install -o "$USER" -m a+xrw "${MAIN_PATH}/test/files/null" "${tmpDir}/" && \
+      install -o "$USER" -m a+xrw "${MAIN_PATH}/test/files/null" "${tmpDir}/"
 
       docker run -d -p ${AIR_PORT}:22 \
       --name "$CONTAINER_NAME" \
       --label "tmpdir=${tmpDir}" \
-      -v "$tmpDir/id_rsa.pub":/root/.ssh/authorized_keys \
-      -v "$tmpDir/":/tmp/ \
-      -v "$tmpDir/null":/usr/bin/save \
+      -v "${tmpDir}/id_rsa.pub":/root/.ssh/authorized_keys \
+      -v "${tmpDir}/":/tmp/ \
+      -v "${tmpDir}/null":/usr/bin/save \
       -e SSH_ENABLE_ROOT=true panubo/sshd:latest
       sleep 2
     fi
