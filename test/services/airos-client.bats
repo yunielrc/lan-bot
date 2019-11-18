@@ -58,7 +58,7 @@ readonly TEST_FILE='airos-client'
     local -r config="netconf.1.hwaddr.mac=${mac}
     resolv.host.1.name=${name}"
     local -r user='baduser'
-
+    skip
     setup_ssh_docker
     local -r  docker_tmpdir="$(tmp_dir_ssh_docker)"
 
@@ -74,7 +74,7 @@ readonly TEST_FILE='airos-client'
     local -r config="netconf.1.hwaddr.mac=${mac}
     resolv.host.1.name=${name}"
     local -r user='root'  
-
+    skip
     setup_ssh_docker
     local -r  docker_tmpdir="$(tmp_dir_ssh_docker)"
 
@@ -97,7 +97,7 @@ readonly TEST_FILE='airos-client'
     local -r mac='B4:2E:F8:20:c0:4d'
     local -r name='NAME12345'
     local -r bad_oui="oui.txt"
-
+    skip
     setup_ssh_docker
     local -r  docker_tmpdir="$(tmp_dir_ssh_docker)"
 
@@ -111,7 +111,7 @@ readonly TEST_FILE='airos-client'
     local -r ip="$AIR_HOST"
     local -r oui="${MAIN_PATH}/test/fixtures/oui.txt"
     local -r user='root'
-
+    skip
     setup_ssh_docker
     local -r  docker_tmpdir="$(tmp_dir_ssh_docker)"
 

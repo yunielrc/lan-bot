@@ -36,13 +36,35 @@ random_mac() {
 }
 
 #######################################
-# Generar random {N} character alphanumeric string
+# Genera una cadena de caracteres aleatoria entre 6 y 15 caracteres
 # Arguments:
 #   1: cantidad de caracteres
 #######################################
 random_alphanumeric() {
   # shellcheck disable=2002
-  cat /dev/urandom | tr -dc 'A-Z0-9' | fold -w "${1:-10}" | head -n 1
+  cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w "$((RANDOM % 10 + 6))" | head -n 1
+  return 0
+}
+
+#######################################
+# Generar un nombre de host aleatorio
+# 
+# Arguments:
+#   1: ruta completa del archivo hostnames.db
+#
+# Returns:
+#   0: host name
+#   74: si no se encontró el archivo hostnames.db
+#######################################
+random_host_name() {
+  local -r hostnames="$1"
+
+  if [ ! -f "$hostnames" ]; then
+    err "No se encontró el archivo hostnames.db '$hostnames'" "$EX_IOERR"
+  fi  
+
+  shuf -n 1 "$hostnames"
+
   return 0
 }
 

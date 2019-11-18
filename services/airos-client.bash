@@ -77,6 +77,10 @@ SSHEOF
 #######################################
 # Cambia la mac de la interfaz WAN y el nombre del dispositivo AirOS
 #
+# Globals:
+# utils_host_random_name
+# utils_host_random_name_params
+#
 # Arguments:
 #   1: usuario
 #   2: ip del dispositivo
@@ -93,10 +97,10 @@ airos.set_random_mac_and_name() {
   local -r defaultkey=~/.ssh/id_rsa
   local -r user="$1" ip="$2" oui="$3" reboot="${4:-1}" puerto=${5:-22} \
   privatekey="${6:-"$defaultkey"}"
-  local -r n=10
   local -r mac="$(random_mac "${oui}")"
   [[ -z "$mac" ]] && exit "$EX_IOERR"
-  local -r name="$(random_alphanumeric "${n}")"
+  # shellcheck disable=2145
+  local -r name="$("$utils_host_random_name" "$utils_host_random_name_params")"
   local -r config="netconf.1.hwaddr.mac=${mac}
   resolv.host.1.name=${name}"
   
