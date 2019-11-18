@@ -50,17 +50,22 @@ readonly TEST_FILE='lib/utils.bash'
 ##
 
 ## random_alphanumeric
-@test "Se genera una cadena '[A-Z0-9]{20}', codigo 0 '${TEST_FILE}:random_alphanumeric'" {
-    local -r n=20
-    run random_alphanumeric "$n"
-    [ "$status" -eq 0 ]
-    [[ "$output" =~ ^[A-Z0-9]{"$n"}$ ]]
-}
-
-@test "Se genera una cadena por defecto de 10 '[A-Z0-9]{10}', codigo 0 '${TEST_FILE}:random_alphanumeric'" {
+@test "Se genera una cadena '[a-zA-Z0-9]{6,15}', codigo 0 '${TEST_FILE}:random_alphanumeric'" {
     run random_alphanumeric
     [ "$status" -eq 0 ]
-    [[ "$output" =~ ^[A-Z0-9]{10}$ ]]
+    [[ "$output" =~ ^[a-zA-Z0-9]{6,15}$ ]]
+}
+##
+
+## random_host_name
+@test "No existe el archivo hostnames.db, codigo ${EX_IOERR} '${TEST_FILE}:random_host_name'" {
+    run random_host_name "${MAIN_PATH}/etc/hostnames.db1"
+    [ "$status" -eq $EX_IOERR ]
+}
+
+@test "Se genera un nombre de host aleatorio, codigo 0 '${TEST_FILE}:random_host_name'" {
+    run random_host_name "${MAIN_PATH}/etc/hostnames.db"
+    [ "$status" -eq 0 ]
 }
 ##
 

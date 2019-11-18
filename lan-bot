@@ -30,6 +30,7 @@ readonly LIB_DIR="${BASE_PATH}/lib"
 source "${BASE_PATH}/lib/exit-codes.bash"
 # shellcheck disable=1090
 source "${BASE_PATH}/lib/utils.bash"
+source "${ETC_DIR}/ioc.bash"
 ##
 
 # IFS=$'\t\n'   # Split on newlines and tabs (but not on spaces)
