@@ -63,9 +63,34 @@ readonly TEST_FILE='lib/utils.bash'
     [ "$status" -eq $EX_IOERR ]
 }
 
-@test "Se genera un nombre de host aleatorio, codigo 0 '${TEST_FILE}:random_host_name'" {
-    run random_host_name "${MAIN_PATH}/etc/hostnames.db"
+@test "Se genera un nombre de host aleatorio, todo minúscula '${TEST_FILE}:random_host_name'" {
+    local -r name="TODO MINUSCULA"
+    readonly CASE_OPT=0
+
+    run random_host_name <(echo "$name")
+
     [ "$status" -eq 0 ]
+    [[ "$output" == "${name,,}" ]]
+}
+
+@test "Se genera un nombre de host aleatorio, todo mayúscula '${TEST_FILE}:random_host_name'" {
+    local -r name="todo mayuscula"
+    readonly CASE_OPT=1
+
+    run random_host_name <(echo "$name")
+
+    [ "$status" -eq 0 ]
+    [[ "$output" == "${name^^}" ]]
+}
+
+@test "Se genera un nombre de host aleatorio, solo primer caracter mayúscula '${TEST_FILE}:random_host_name'" {
+    local -r name="primer caracter mayuscula"
+    readonly CASE_OPT=2
+
+    run random_host_name <(echo "$name")
+
+    [ "$status" -eq 0 ]
+    [[ "$output" == "${name^}" ]]
 }
 ##
 
