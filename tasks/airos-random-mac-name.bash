@@ -1,4 +1,4 @@
-# Modifica la mac y el nombre del un dispositivo AirOS a partir de valores generados.
+# Modifica la mac y el nombre del dispositivo AirOS a partir de valores generados.
 
 ## Includes
 # shellcheck disable=1090
@@ -28,7 +28,7 @@ usage(){
 
   Cambia la mac de la interfaz WAN y el nombre de red a un dispositivo AirOS
   a partir de valores aleatorios. Si tuvo éxito imprime la nueva mac y el nuevo
-  nombre del dispositivo AirOS
+  nombre del dispositivo AirOS.
 
   Requisitos:
   - El dispositivo AirOS debe tener agregada la clave pública del sistema donde
@@ -39,13 +39,15 @@ usage(){
   - Tener habilitada la opción 'Network/WAN Network Settings/MAC Address Cloning'
     en el dispositivo AirOS.
 
-  Options: ${ENTRY_POINT} ${TASK} --user john --ip 192.168.0.1 [--reboot]
-
+  Options:
     -h, --help             Muestra la ayuda
     -u, --user,            Usuario del dispositivo AirOS
     -i, --ip               IP del dispositivo AirOS
     -o, --oui              Ruta completa del archivo oui.txt
     -r, --reboot           reinicia el dispositivo AirOS para aplicar los cambios
+  
+  Example:
+  ${ENTRY_POINT} ${TASK} --user john --ip 192.168.0.1 [--reboot]
 
   Exit status:
   0: Configuración cambiada en dispositivo AirOS

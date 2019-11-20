@@ -30,6 +30,7 @@ readonly LIB_DIR="${BASE_PATH}/lib"
 source "${BASE_PATH}/lib/exit-codes.bash"
 # shellcheck disable=1090
 source "${BASE_PATH}/lib/utils.bash"
+# shellcheck disable=1090
 source "${ETC_DIR}/ioc.bash"
 ##
 
@@ -89,6 +90,7 @@ print_run_task_result() {
 #######################################
 run_task(){
   local -r task="$1"
+  local -r p1="${2:-}"
   shift
   local -r taskFullPath="${TASK_DIR}/${task}.bash"
 
@@ -104,7 +106,11 @@ run_task(){
   [[ -z "$msg" ]] && msg='OK'
   local -r time2=$(date +%s)
 
-  print_run_task_result "$task" "$(( time2 - time1 ))" "$code" "$msg"
+  if [[ "$#" == 0 || "$p1" == '-h' || "$p1" == '--help' ]]; then
+    echo "$msg"
+  else
+    print_run_task_result "$task" "$(( time2 - time1 ))" "$code" "$msg"
+  fi
 
   return $code
 }

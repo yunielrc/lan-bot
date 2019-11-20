@@ -1,11 +1,8 @@
 # lan-bot
 
-Automatiza tareas en la red local de la casa
-
+Automatiza tareas en la red local
 
 ## Instalación
-
-
 
 ## Uso
 
@@ -14,9 +11,11 @@ Automatiza tareas en la red local de la casa
 ```
 
 ## Contributing
+
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
 Please make sure to update tests as appropriate.
 
 ## License
+
 [MIT](https://choosealicense.com/licenses/mit/)
