@@ -52,6 +52,10 @@ random_alphanumeric() {
 # Arguments:
 #   1: ruta completa del archivo hostnames.db
 #
+# Globals:
+# ENVIRONMENT: TEST,PROD
+# CASE_OPT: 0 - todo minúscula, 1 - todo mayúscula, 2 - solo primer caracter mayúscula
+#
 # Returns:
 #   0: host name
 #   74: si no se encontró el archivo hostnames.db
@@ -59,11 +63,36 @@ random_alphanumeric() {
 random_host_name() {
   local -r hostnames="$1"
 
-  if [ ! -f "$hostnames" ]; then
+  if [ ! -e "$hostnames" ]; then
     err "No se encontró el archivo hostnames.db '$hostnames'" "$EX_IOERR"
-  fi  
+  fi
 
-  shuf -n 1 "$hostnames"
+  local name=""
+  name="$(shuf -n 1 "$hostnames")"
+  local caseOpt="$((RANDOM % 3))"
+
+  if [[ "${ENVIRONMENT:-}" ==  'TEST' ]]; then
+    caseOpt="${CASE_OPT}"
+  fi
+
+  # opciones case
+  case "$caseOpt" in
+    0)
+      # todo minúscula
+      name="${name,,}"
+    ;;
+    1)
+      # todo mayúscula
+      name="${name^^}"
+    ;;
+    2)
+      # solo primer caracter mayúscula
+      name="${name,,}"
+      name="${name^}"
+    ;;
+  esac
+
+  echo "$name"
 
   return 0
 }

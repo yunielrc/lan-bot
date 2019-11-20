@@ -4,6 +4,7 @@ readonly MAIN_PATH="$PWD"
 readonly TEST_DIR="${MAIN_PATH}/test"
 readonly TEST_STUBS_DIR="${TEST_DIR}/stubs"
 readonly TEST_STUBS_TASKS_DIR="${TEST_STUBS_DIR}/tasks"
+readonly ENVIRONMENT='TEST'
 ##
 
 ## ENV
